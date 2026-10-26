@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="robots" content="noindex"><style>body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Field Sourcing Guide</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+/* Layout: one reading column. How to record a value, the field table, then the regional headcount method with a worked example and a small calculator. */
+:root{
+  --bg:#f6f7f9; --paper:#ffffff; --ink:#18202b; --muted:#5b6676; --rule:#dde2e8;
+  --accent:#225c8f; --accent-soft:#e7f0f8; --note:#8a5a12; --note-soft:#f7eedd;
+  --body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif; --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#11151b; --paper:#181e26; --ink:#e6eaf0; --muted:#9aa5b4; --rule:#2b333e;
+  --accent:#86b8e3; --accent-soft:#1c2937; --note:#e2ad62; --note-soft:#30261a; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#11151b; --paper:#181e26; --ink:#e6eaf0; --muted:#9aa5b4; --rule:#2b333e;
+  --accent:#86b8e3; --accent-soft:#1c2937; --note:#e2ad62; --note-soft:#30261a; color-scheme:dark}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.55}
+.wrap{max-width:1080px;margin:0 auto;padding-block:36px 56px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:grid;gap:30px}
+header{display:grid;gap:8px}
+.eyebrow{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:600}
+h1{font-size:clamp(26px,4vw,32px);line-height:1.2;margin:0;text-wrap:balance}
+h2{font-size:19px;margin:0;text-wrap:balance}
+p{margin:0;max-width:72ch}
+.lead{color:var(--muted)}
+section{display:grid;gap:12px}
+.rec{display:flex;flex-wrap:wrap;gap:10px}
+.rec div{background:var(--paper);border:1px solid var(--rule);border-radius:6px;padding:10px 14px;min-width:0}
+.rec b{display:block;font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--accent)}
+.tablewrap{overflow-x:auto;background:var(--paper);border:1px solid var(--rule);border-radius:6px}
+table{border-collapse:collapse;width:100%;min-width:860px;font-size:14px}
+th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--rule);vertical-align:top}
+th{font-size:11px;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);font-weight:700;background:var(--bg)}
+tr:last-child td{border-bottom:0}
+td:first-child{font-weight:600;white-space:nowrap}
+td.tol{font-family:var(--mono);font-size:13px;white-space:nowrap}
+.steps{margin:0;padding-left:20px;display:grid;gap:6px;max-width:76ch}
+.map{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:8px}
+.map div{background:var(--paper);border:1px solid var(--rule);border-radius:6px;padding:8px 12px;font-size:14px;min-width:0}
+.map b{display:block}
+.calc{background:var(--accent-soft);border-radius:6px;padding:16px;display:grid;gap:12px}
+.calc .row{display:flex;flex-wrap:wrap;gap:12px;align-items:end}
+.calc label{display:grid;gap:4px;font-size:13px;font-weight:600}
+.calc input{font:inherit;font-family:var(--mono);width:150px;padding:6px 8px;border:1px solid var(--rule);border-radius:4px;background:var(--paper);color:var(--ink)}
+.calc input:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.out{font-family:var(--mono);font-size:16px}
+.out b{font-size:22px}
+.note{background:var(--note-soft);border-radius:6px;padding:10px 14px;font-size:14px}
+.note b{color:var(--note)}
+.n{font-family:var(--mono);font-variant-numeric:tabular-nums}
+</style>
+<div class="wrap">
+  <header>
+    <span class="eyebrow">Clay account enrichment · Manual review guide</span>
+    <h1>How to source each field so your numbers match ours</h1>
+    <p class="lead">Use this alongside your field definitions. It lists where Clay looks for each field, in the same order, so a value found by hand can be compared one-to-one with the workflow's.</p>
+  </header>
+
+  <section>
+    <h2>For every field, record two things</h2>
+    <div class="rec">
+      <div><b>The value</b>The number or name you found</div>
+      <div><b>The source link</b>The page you read it on (10-K, company site, LinkedIn page)</div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Where to look, field by field</h2>
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th>Field</th><th>Where to look, in this order</th><th>How to count it</th><th>Match within</th></tr></thead>
+        <tbody>
+          <tr><td>Employee count</td><td>The company's own figure (website, 10-K, press release), then LinkedIn's employee count</td><td>This company only, not its parent group. Figure dated within 24 months.</td><td class="tol">5%</td></tr>
+          <tr><td>HQ address</td><td>Company website (locations or contact page), then LinkedIn</td><td>The office in the account's own country. Global HQ only if it has no office there.</td><td class="tol">city + country exact</td></tr>
+          <tr><td>HQ country</td><td>Same as the address</td><td>Country of that office</td><td class="tol">exact</td></tr>
+          <tr><td>Industry</td><td>Your industry taxonomy</td><td>One of your approved account industries</td><td class="tol">exact</td></tr>
+          <tr><td>Annual revenue</td><td>10-K, 20-F or annual report, then ZoomInfo</td><td>Latest fiscal year, USD. The company's own revenue, not its parent's.</td><td class="tol">20%</td></tr>
+          <tr><td>Founded year</td><td>Company website, then LinkedIn</td><td>When the current company was founded, not a predecessor</td><td class="tol">exact</td></tr>
+          <tr><td>Office count</td><td>Company website locations page</td><td>HQ, corporate and regional offices. Leave out stores, branches, plants, labs and warehouses.</td><td class="tol">±1 up to 5, 25% above</td></tr>
+          <tr><td>Parent</td><td>Company website, filings, press</td><td>The operating company that directly owns it. A PE firm or other fund goes in the investor field, not here.</td><td class="tol">same account</td></tr>
+          <tr><td>Ultimate parent</td><td>Same as parent</td><td>The top operating company in the chain, funds left out</td><td class="tol">same account</td></tr>
+          <tr><td>Employee growth (12 months)</td><td>LinkedIn headcount insights</td><td>(headcount now − headcount 12 months ago) ÷ headcount 12 months ago, as a decimal</td><td class="tol">±2 points</td></tr>
+          <tr><td>Number of countries</td><td>LinkedIn People tab, by location</td><td>Countries with at least one employee</td><td class="tol">±2</td></tr>
+          <tr><td>Regional headcount</td><td>LinkedIn People tab by location, plus the employee count above</td><td>The region's share of employees × the employee count. See the method below.</td><td class="tol">5 points of share</td></tr>
+          <tr><td>Sales, Engineering, Finance team size</td><td>LinkedIn people search, filtered by job function</td><td>One job function each: Sales, Engineering, Finance</td><td class="tol">20%</td></tr>
+          <tr><td>Operations team size</td><td>LinkedIn people search, filtered by job function</td><td>Clay's "Business Management and Operations" function, which Clay's filter shows as "Business Development"</td><td class="tol">20%</td></tr>
+          <tr><td>Senior leaders</td><td>LinkedIn people search, filtered by seniority</td><td>Owner, founder, C-suite, partner and VP</td><td class="tol">20%</td></tr>
+          <tr><td>Open jobs</td><td>The company's LinkedIn Jobs tab</td><td>Every posting, including the same role posted in several locations</td><td class="tol">25%</td></tr>
+          <tr><td>Funding</td><td>ZoomInfo, then Crunchbase</td><td>Latest round (amount in USD, date, type) and total raised</td><td class="tol">amount 10%, date to the month</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <h2>Regional headcount: the method</h2>
+    <p>LinkedIn only shows the employees who list the company and a location, often a fraction of the workforce. So we take LinkedIn's regional mix and apply it to the full employee count.</p>
+    <ol class="steps">
+      <li>Take the account's employee count (the first row above).</li>
+      <li>On the company's LinkedIn People tab, count employees by country, then group the countries into regions using the list below.</li>
+      <li>Share = the region's employees ÷ all employees with a known country.</li>
+      <li>Estimate = share × employee count, rounded to the nearest whole person.</li>
+      <li>A region with no employees on LinkedIn stays blank.</li>
+    </ol>
+    <div class="map">
+      <div><b>North America</b>US (incl. Puerto Rico) and Canada</div>
+      <div><b>Canada</b>Also reported on its own</div>
+      <div><b>UKI</b>United Kingdom and Ireland</div>
+      <div><b>France</b>France and Monaco</div>
+      <div><b>DACH</b>Germany, Austria, Switzerland, Liechtenstein</div>
+      <div><b>Benelux</b>Belgium, Netherlands, Luxembourg</div>
+      <div><b>Nordics</b>Denmark, Finland, Iceland, Norway, Sweden</div>
+      <div><b>APAC</b>Asia-Pacific, including India</div>
+      <div><b>India</b>Also reported on its own</div>
+      <div><b>No field</b>Mexico, Latin America and every other country count toward the total only</div>
+    </div>
+    <p class="note"><b>Adding up the fields:</b> North America already includes Canada and APAC already includes India, so don't add those twice. The rest of the world has no field, so the regions add up to a little less than the employee count.</p>
+  </section>
+
+  <section>
+    <h2>Worked example: Sally Beauty</h2>
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th>Region</th><th>Employees on LinkedIn</th><th>Share</th><th>× 16,000 employees</th></tr></thead>
+        <tbody>
+          <tr><td>North America</td><td class="n">2,852</td><td class="n">94.6%</td><td class="n">15,130</td></tr>
+          <tr><td>Canada (within North America)</td><td class="n">99</td><td class="n">3.3%</td><td class="n">525</td></tr>
+          <tr><td>UKI</td><td class="n">39</td><td class="n">1.3%</td><td class="n">207</td></tr>
+          <tr><td>Benelux</td><td class="n">13</td><td class="n">0.4%</td><td class="n">69</td></tr>
+          <tr><td>APAC</td><td class="n">8</td><td class="n">0.3%</td><td class="n">42</td></tr>
+          <tr><td>India (within APAC)</td><td class="n">2</td><td class="n">0.1%</td><td class="n">11</td></tr>
+          <tr><td>France</td><td class="n">2</td><td class="n">0.1%</td><td class="n">11</td></tr>
+          <tr><td>DACH, Nordics</td><td class="n">0</td><td class="n">0%</td><td>blank</td></tr>
+          <tr><td>Rest of world (no field)</td><td class="n">102</td><td class="n">3.4%</td><td class="n">541</td></tr>
+          <tr><td>All with a known country</td><td class="n">3,016</td><td class="n">100%</td><td class="n">16,000</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="lead">Sally Beauty's employee count is 16,000, from its own careers page. North America: 2,852 ÷ 3,016 = 94.6%, and 94.6% × 16,000 = 15,130.</p>
+  </section>
+
+  <section>
+    <h2>Check a region</h2>
+    <div class="calc">
+      <div class="row">
+        <label for="tot">Employee count<input id="tot" type="number" min="0" value="16000"></label>
+        <label for="reg">Region's employees on LinkedIn<input id="reg" type="number" min="0" value="2852"></label>
+        <label for="all">All with a known country<input id="all" type="number" min="0" value="3016"></label>
+      </div>
+      <p class="out" id="out" aria-live="polite"></p>
+    </div>
+  </section>
+</div>
+<script>
+(function(){
+  var t=document.getElementById('tot'), r=document.getElementById('reg'), a=document.getElementById('all'), o=document.getElementById('out');
+  function f(n){ return n.toLocaleString('en-US'); }
+  function calc(){
+    var T=+t.value, R=+r.value, A=+a.value;
+    if(!(A>0) || !(T>0)){ o.textContent='Enter an employee count and the employees with a known country.'; return; }
+    if(R===0){ o.textContent='No employees on LinkedIn in this region: leave the field blank.'; return; }
+    var s=R/A, e=Math.floor(s*T+0.5);
+    o.innerHTML='Share '+(s*100).toFixed(1)+'% → estimate <b>'+f(e)+'</b>';
+  }
+  [t,r,a].forEach(function(el){ el.addEventListener('input', calc); });
+  calc();
+})();
+</script>
+
+</html>
